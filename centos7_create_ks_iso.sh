@@ -1,34 +1,38 @@
 #!/bin/bash
 
 cd /tmp
-sudo yum install -y curl rsync isomd5sum genisoimage
+sudo yum install -y curl rsync syslinux
 
 curl -RO http://ftp.ntua.gr/pub/linux/centos/7/isos/x86_64/CentOS-7-x86_64-NetInstall-1804.iso
 
-sudo mkdir /media/mydrive
-sudo mount -o loop CentOS-7-x86_64-NetInstall-1804.iso /media/mydrive
+sudo mkdir /media/{BOOT,DATA,DVD}
+sudo parted --script /dev/sdb \
+	mklabel msdos \
+	mkpart primary fat32    1MiB       250MiB \
+	mkpart primary ext4    250MiB       -1MiB \
+	set 1 boot on
 
-sudo mkdir -p /var/tmp/media/mydrive
-sudo rsync -av /media/mydrive/ /var/tmp/media/mydrive/
-sudo umount /media/mydrive
+sudo mkfs -t vfat -n "BOOT" /dev/sdb1
+sudo mkfs -L "DATA" /dev/sdb2
 
-sudo cp /home/vagrant/ks.cfg /var/tmp/media/mydrive/ks.cfg
+sudo syslinux --directory syslinux --install /dev/sdb1
+sudo dd conv=notrunc bs=440 count=1 if=/usr/share/syslinux/mbr.bin of=/dev/sdb
 
-sudo sed -i 's/64 quiet/64 quiet inst.text inst.ks=file\:\/run\/install\/repo\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/isolinux/isolinux.cfg
-sudo sed -i 's/64 quiet/64 quiet inst.text inst.ks=file\:\/run\/install\/repo\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
-sudo sed -i 's/check quiet/check quiet inst.text inst.ks=file\:\/run\/install\/repo\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
-sudo sed -i 's/set quiet/set quiet inst.text inst.ks=file\:\/run\/install\/repo\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
-sudo sed -i 's/default="1"/default="0"/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
+sudo mount -o loop CentOS-7-x86_64-NetInstall-1804.iso /media/DVD
+sudo mount /dev/sdb1 /media/BOOT
+sudo mount /dev/sdb2 /media/DATA
 
-cd /var/tmp/media/mydrive
-sudo genisoimage -o /tmp/CentOS-7-x86_64-NetInstall-1804_ks_mbr.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -J -R -v -T -V 'CentOS 7 x86_64' .
-sudo genisoimage -o /tmp/CentOS-7-x86_64-NetInstall-1804_ks_efi.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -J -R -v -T -V 'CentOS 7 x86_64' .
+sudo rsync -av /media/DVD/isolinux /media/BOOT
+sudo mv /media/BOOT/isolinux/isolinux.cfg /media/BOOT/syslinux/syslinux.cfg
+sudo cp /media/BOOT/isolinux/{boot.cat,boot.msg,initrd.img,memtest,splash.png,vmlinuz} /media/BOOT/syslinux/
+sudo cp /usr/share/syslinux/vesamenu.c32 /media/BOOT/syslinux/
 
-cd /tmp
-sudo implantisomd5 /tmp/CentOS-7-x86_64-NetInstall-1804_ks_mbr.iso
-sudo implantisomd5 /tmp/CentOS-7-x86_64-NetInstall-1804_ks_efi.iso
+sudo rm -rf /media/BOOT/isolinux
 
-sudo isohybrid /tmp/CentOS-7-x86_64-NetInstall-1804_ks_mbr.iso
-sudo isohybrid --uefi /tmp/CentOS-7-x86_64-NetInstall-1804_ks_efi.iso
+sudo cp /home/vagrant/ks.cfg /media/BOOT/syslinux/ks.cfg
+sudo cp /tmp/CentOS-7-x86_64-NetInstall-1804.iso /media/DATA/
 
-sudo rm -rf /var/tmp/media /media/mydrive /tmp/CentOS-7-x86_64-NetInstall-1804.iso
+sudo sed -i 's/CentOS\\x207\\x20x86_64 quiet/DATA:\/ quiet inst.text inst.ks=hd:LABEL=BOOT:/syslinux/ks.cfg net.ifnames=0 biosdevname=0/g' /media/BOOT/syslinux/syslinux.cfg
+
+sudo umount /media/{BOOT,DATA,DVD}
+sudo rm -rf /media/{BOOT,DATA,DVD} /tmp/CentOS-7-x86_64-NetInstall-1804.iso
