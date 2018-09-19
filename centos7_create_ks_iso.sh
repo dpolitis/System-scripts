@@ -28,4 +28,7 @@ cd /tmp
 sudo implantisomd5 /tmp/CentOS-7-x86_64-NetInstall-1804_ks_mbr.iso
 sudo implantisomd5 /tmp/CentOS-7-x86_64-NetInstall-1804_ks_efi.iso
 
+sudo isohybrid /tmp/CentOS-7-x86_64-NetInstall-1804_ks_mbr.iso
+sudo isohybrid --uefi isohybrid /tmp/CentOS-7-x86_64-NetInstall-1804_ks_efi.iso
+
 sudo rm -rf /var/tmp/media /media/mydrive /tmp/CentOS-7-x86_64-NetInstall-1804.iso
