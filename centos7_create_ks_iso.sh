@@ -14,10 +14,10 @@ sudo umount /media/mydrive
 
 sudo cp /home/vagrant/ks.cfg /var/tmp/media/mydrive/ks.cfg
 
-sudo sed -i 's/64 quiet/64 quiet inst.text inst.ks=cdrom\:\/dev\/cdrom\:\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/isolinux/isolinux.cfg
-sudo sed -i 's/64 quiet/64 quiet inst.text inst.ks=cdrom\:\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
-sudo sed -i 's/check quiet/check quiet inst.text inst.ks=cdrom\:\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
-sudo sed -i 's/set quiet/set quiet inst.text inst.ks=cdrom\:\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
+sudo sed -i 's/64 quiet/64 quiet inst.text inst.ks=file\:\/run\/install\/repo\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/isolinux/isolinux.cfg
+sudo sed -i 's/64 quiet/64 quiet inst.text inst.ks=file\:\/run\/install\/repo\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
+sudo sed -i 's/check quiet/check quiet inst.text inst.ks=file\:\/run\/install\/repo\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
+sudo sed -i 's/set quiet/set quiet inst.text inst.ks=file\:\/run\/install\/repo\/ks.cfg net.ifnames=0 biosdevname=0/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
 sudo sed -i 's/default="1"/default="0"/g' /var/tmp/media/mydrive/EFI/BOOT/grub.cfg
 
 cd /var/tmp/media/mydrive
