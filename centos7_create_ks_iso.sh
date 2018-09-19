@@ -22,7 +22,7 @@ sudo sed -i 's/default="1"/default="0"/g' /var/tmp/media/mydrive/EFI/BOOT/grub.c
 
 cd /var/tmp/media/mydrive
 sudo genisoimage -o /tmp/CentOS-7-x86_64-NetInstall-1804_ks_mbr.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -J -R -v -T -V 'CentOS 7 x86_64' .
-sudo genisoimage -o /tmp/CentOS-7-x86_64-NetInstall-1804_ks_efi.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -J -R -v -T -V 'CentOS 7 x86_64' .
+sudo genisoimage -o /tmp/CentOS-7-x86_64-NetInstall-1804_ks_efi.iso -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -eltorito-platform 0xEF -e images/efiboot.img -no-emul-boot -J -R -v -T -V 'CentOS 7 x86_64' .
 
 cd /tmp
 sudo implantisomd5 /tmp/CentOS-7-x86_64-NetInstall-1804_ks_mbr.iso
