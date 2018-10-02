@@ -38,7 +38,7 @@ EOCONF2'
 sudo chown -R 1008:33 /edx/app/insights
 
 sudo mkdir -p /usr/share/ca-certificates/incommon
-sudo su -c "cat > /usr/share/ca-certificates/incommon/InCommonServerCA.crt << EOCERT
+sudo su -c 'cat > /usr/share/ca-certificates/incommon/InCommonServerCA.crt << EOCERT
 Certificate:
     Data:
         Version: 3 (0x2)
@@ -138,7 +138,7 @@ xY4asgRckmYOha0uBs7Io9jrFCeR3s8XMIFTtmYSrTfk9e+WXCAONumsYn0ZgYr1
 kGGmSavOPN/mymTugmU5RZUWukEGAJi6DFZh5MbGhgHPZqkiKQLWPc/EKo2Z3vsJ
 FJ4O0dXG14HdrSSrrAcF4h1ow3BmX9M=
 -----END CERTIFICATE-----
-EOCERT"
+EOCERT'
 
 # 1. Set the OPENEDX_RELEASE variable:
 export OPENEDX_RELEASE="open-release/ginkgo.2"
@@ -157,9 +157,10 @@ if [[ -f server-vars.yml ]]; then
    echo "found server-vars.yml. Copying to /edx/app/edx_ansible/server-vars.yml";
    sudo cp server-vars.yml /edx/app/edx_ansible/server-vars.yml
 fi
+rm ~/generate-passwords.*
 
 # 4. Install Open edX. For Ginkgo and older, this will be a 404, and you need to use sandbox.sh instead of native.sh
-cat > ~/edx.patch << EOP
+sudo su -c 'cat > /var/tmp/edx.patch << EOPATCH
 diff -ur --no-dereference configuration.old/docker/build/go-agent/files/docker_install.sh configuration/docker/build/go-agent/files/docker_install.sh
 --- configuration.old/docker/build/go-agent/files/docker_install.sh	2018-10-01 20:14:32.456763066 +0300
 +++ configuration/docker/build/go-agent/files/docker_install.sh	2018-10-01 13:46:33.148662474 +0300
@@ -209,7 +210,7 @@ diff -ur --no-dereference configuration.old/playbooks/roles/edxapp/defaults/main
  # make this the public URL instead of writable
 -edx_platform_repo: "https://{{ COMMON_GIT_MIRROR }}/edx/edx-platform.git"
 +edx_platform_repo: "http://{{ COMMON_GIT_MIRROR }}/edx/edx-platform.git"
- # `edx_platform_version` can be anything that git recognizes as a commit
+ # \`edx_platform_version\` can be anything that git recognizes as a commit
  # reference, including a tag, a branch name, or a commit hash
  edx_platform_version: 'release'
 diff -ur --no-dereference configuration.old/playbooks/roles/edx_service/tasks/main.yml configuration/playbooks/roles/edx_service/tasks/main.yml
@@ -309,16 +310,17 @@ diff -ur --no-dereference configuration.old/util/vpc-tools/abbey.py configuratio
  EDX_PPA_KEY_ID="B41E5E3969464050"
 
  cat << EOF
-EOP
+EOPATCH'
 
 cd /var/tmp
 git clone https://github.com/edx/configuration
 cd configuration
 git checkout $OPENEDX_RELEASE
 cd /var/tmp
-patch -p0 < ~/edx.patch
+patch -p0 < edx.patch
 cd
 wget https://raw.githubusercontent.com/edx/configuration/$OPENEDX_RELEASE/util/install/sandbox.sh
 sed -i 's/git clone/#git clone/g' sandbox.sh
 cat sandbox.sh | bash
 rm ~/sandbox.*
+sudo rm /var/tmp/edx.patch
