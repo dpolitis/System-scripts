@@ -10,16 +10,31 @@ sudo chown -R 0:0 /edx/app
 
 cd /edx/app/ecommerce
 sudo git clone http://github.com/edx/ecommerce.git
+cd ecommerce
 sudo git checkout 83088e688d9e7c80ef9df856a4b3cfabfbc57fa2
-sudo sed -i 's/bower.herokuapp.com/registry.bower.io/g' ./ecommerce/node_modules/bower/lib/node_modules/bower-config/lib/util/expand.js
-sudo sed -i 's/bower.herokuapp.com/registry.bower.io/g' ./ecommerce/node_modules/bower/lib/node_modules/bower-config/lib/util/defaults.js
+sudo su -c 'cat > /edx/app/ecommerce/ecommerce/.bowerrc << EOCONF1
+{
+  "directory": "ecommerce/static/bower_components",
+  "interactive": false,
+  "registry": "https://registry.bower.io"
+}
+EOCONF1'
 sudo chown -R 1005:33 /edx/app/ecommerce
 
 cd /edx/app/insights
 sudo git clone http://github.com/edx/edx-analytics-dashboard.git
+cd edx-analytics-dashboard
 sudo git checkout 10c6afa58d4ee46b3b2becf12c237875108655dc
-sudo sed -i 's/bower.herokuapp.com/registry.bower.io/g' ./edx_analytics_dashboard/node_modules/bower/lib/node_modules/bower-config/lib/util/expand.js
-sudo sed -i 's/bower.herokuapp.com/registry.bower.io/g' ./edx_analytics_dashboard/node_modules/bower/lib/node_modules/bower-config/lib/util/defaults.js
+sudo su -c 'cat > /edx/app/insights/edx-analytics-dashboard/.bowerrc << EOCONF2
+{
+  "directory": "analytics_dashboard/static/bower_components",
+  "interactive": false,
+  "registry": "https://registry.bower.io",
+  "scripts": {
+    "postinstall": "./bower-post-install.sh"
+  }
+}
+EOCONF2'
 sudo chown -R 1008:33 /edx/app/insights
 
 sudo mkdir -p /usr/share/ca-certificates/incommon
