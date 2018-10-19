@@ -13,6 +13,11 @@ net.ipv6.conf.lo.disable_ipv6=1
 kernel.printk = 1 4 1 7
 EOF
 
+# disable ipv6 in kernel
+mount -o remount,rw /boot
+sed -i 's/8n1/8n1 ipv6.disable=1/g' /boot/grub/grub.cfg
+mount -o remount,ro /boot
+
 # Remove all firewall rules
 uci delete firewall.@zone[2]
 uci delete firewall.@zone[1]
@@ -106,7 +111,7 @@ mv /etc/dropbear/authorized_keys.part /etc/dropbear/authorized_keys
 EOF
 
 opkg update
-opkg install openssl-util nano htop
+opkg install openssl-util nano htop wpad kmod-rt2800-usb
 
 opkg install luci-ssl
 
