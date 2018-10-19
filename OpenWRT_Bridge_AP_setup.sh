@@ -15,7 +15,7 @@ EOF
 
 # disable ipv6 in kernel
 mount -o remount,rw /boot
-sed -i 's/8n1/8n1 ipv6.disable=1/g' /boot/grub/grub.cfg
+sed -i 's/n8/n8 ipv6.disable=1/g' /boot/grub/grub.cfg
 mount -o remount,ro /boot
 
 # Remove all firewall rules
