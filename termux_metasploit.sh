@@ -5,7 +5,7 @@ name=$(basename "$0")
 export msfinst="$cwd/$name"
 #sha_actual=$(sha256sum $(echo $msfinst))
 #echo $sha_actual
-if [ $name != "metasploit.sh" ]; then
+if [ $name != "termux_metasploit.sh" ]; then
 	echo "[-] Please do not use third-party stolen scripts"
 	exit 1
 fi
