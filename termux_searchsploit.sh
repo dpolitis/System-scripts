@@ -5,7 +5,7 @@ name=$(basename "$0")
 export exploitdbinst="$cwd/$name"
 #sha_actual=$(sha256sum $(echo $exploitdbinst))
 #echo $sha_actual
-if [ $name != "searchsploit.sh" ]; then
+if [ $name != "termux_searchsploit.sh" ]; then
 	echo "[-] Please do not use third-party stolen scripts"
 	exit 1
 fi
