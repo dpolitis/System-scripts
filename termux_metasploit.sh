@@ -45,7 +45,7 @@ pg_ctl -D $PREFIX/var/lib/postgresql restart
 ruby $msfpath/metasploit-framework/msfconsole" > $PREFIX/bin/msfconsole
 
 echo "#!/data/data/com.termux/files/usr/bin/bash
-ruby $msfpath/metasploit-framework/msfvenom" > $PREFIX/bin/msfvenom
+ruby $msfpath/metasploit-framework/msfvenom $@" > $PREFIX/bin/msfvenom
 
 chmod +rwx $PREFIX/bin/msfconsole
 chmod +rwx $PREFIX/bin/msfvenom
