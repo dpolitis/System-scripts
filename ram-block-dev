@@ -1,0 +1,21 @@
+# Create mountpoint for tmpfs
+mkdir /tmp/tmpfs
+# Mount tmpfs there
+mount -t tmpfs none /tmp/tmpfs
+# Create empty file of 600MB 
+# (it creates 599MB hole, so it does not 
+#  consume more memory than needed)
+dd if=/dev/zero of=/tmp/tmpfs/img.bin bs=1M seek=599 count=1
+# Partition the image file
+cfdisk /tmp/tmpfs/img.bin 
+# Create loop block device of it (-P makes kernel look for partitions)
+losetup -P /dev/loop0 /tmp/tmpfs/img.bin 
+# Create filesystems
+mkfs.vfat /dev/loop0p1 
+mkfs.ext4 /dev/loop0p2
+# Now it's your turn:
+#   mount loop0p1 and loop0p2 and copy whatever you want and unmount it
+# detach the loop device
+losetup -d /dev/loop0
+# May i present you with your image ... 
+ls -al /tmp/tmpfs/img.bin
